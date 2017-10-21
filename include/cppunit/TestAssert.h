@@ -5,6 +5,7 @@
 #include <cppunit/Exception.h>
 #include <cppunit/Asserter.h>
 #include <cppunit/portability/Stream.h>
+#include <cppunit/tools/StringHelper.h>
 #include <stdio.h>
 #include <float.h> // For struct assertion_traits<double>
 
@@ -16,7 +17,6 @@
 
 
 CPPUNIT_NS_BEGIN
-
 
 /*! \brief Traits used by CPPUNIT_ASSERT* macros.
  *
@@ -71,21 +71,9 @@ struct assertion_traits
 
     static std::string toString( const T& x )
     {
-        OStringStream ost;
-// Work around "passing 'T' chooses 'int' over 'unsigned int'" warnings when T
-// is an enum type:
-#if defined __GNUC__ && ((__GNUC__ == 4 && __GNUC_MINOR__ >= 6) || __GNUC__ > 4)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wsign-promo"
-#endif
-        ost << x;
-#if defined __GNUC__ && ((__GNUC__ == 4 && __GNUC_MINOR__ >= 6) || __GNUC__ > 4)
-#pragma GCC diagnostic pop
-#endif
-        return ost.str();
+        return CPPUNIT_NS::StringHelper::toString(x);
     }
 };
-
 
 /*! \brief Traits used by CPPUNIT_ASSERT_DOUBLES_EQUAL(). 
  * 
@@ -487,7 +475,7 @@ void assertGreaterEqual( const T& expected,
 
 
 // implementation detail
-#if CPPUNIT_USE_TYPEINFO_NAME
+#if defined(CPPUNIT_USE_TYPEINFO_NAME)
 #define CPPUNIT_EXTRACT_EXCEPTION_TYPE_( exception, no_rtti_message ) \
    CPPUNIT_NS::TypeInfoHelper::getClassName( typeid(exception) )
 #else

@@ -47,24 +47,9 @@ AC_CXX_HAVE_STRSTREAM
 BB_ENABLE_DOXYGEN
 
 # Compiler characteristics
-AC_CXX_RTTI
 AX_CXX_GCC_ABI_DEMANGLE
 AC_CXX_STRING_COMPARE_STRING_FIRST
-
-AC_ARG_ENABLE([typeinfo-name],
-	[AS_HELP_STRING([--disable-typeinfo-name], [Disable use of RTTI for class names])],
-	[enable_typeinfo_name="$enableval"],
-	[enable_typeinfo_name=yes]
-)
-AS_IF([test x"$enable_typeinfo_name" = "xno" -o x"$HAVE_RTTI" != "x1"], [
-	use_typeinfo="yes"
-	typeinfoval="CPPUNIT_HAVE_RTTI"
-], [
-	use_typeinfo="no"
-	typeinfoval="0"
-])
-AC_DEFINE_UNQUOTED(USE_TYPEINFO_NAME, [$typeinfoval],
-	[Define to 1 to use type_info::name() for class names])
+AX_CXX_COMPILE_STDCXX_11(noext, mandatory)
 
 # =================================
 # Libtool/Version Makefile settings
@@ -83,6 +68,7 @@ AC_SUBST(LT_CURRENT)
 AC_SUBST(LT_REVISION, [cppunit_interface_age])
 AC_SUBST(LT_AGE)
 
+
 # ================
 # Check for cflags
 # ================
@@ -91,7 +77,7 @@ AC_SUBST(LT_AGE)
 # Debug
 # =====
 AC_ARG_ENABLE(debug,
-	AS_HELP_STRING([--enable-debug], [Build with debug features in mind.])],
+	AS_HELP_STRING([--enable-debug], [Build with debug symbols.]),
 	[enable_debug="$enableval"],
 	[enable_debug=no]
 )
@@ -133,7 +119,6 @@ AC_CONFIG_FILES([
 	Makefile
 	cppunit.pc
 	cppunit.spec
-	cppunit-config
 	src/Makefile
 	src/DllPlugInTester/Makefile
 	src/cppunit/Makefile
@@ -145,8 +130,6 @@ AC_CONFIG_FILES([
 	include/cppunit/portability/Makefile
 	include/cppunit/tools/Makefile
 	include/cppunit/ui/Makefile
-	include/cppunit/ui/mfc/Makefile
-	include/cppunit/ui/qt/Makefile
 	include/cppunit/ui/text/Makefile
 	doc/Makefile
 	doc/Doxyfile
@@ -166,9 +149,8 @@ AC_OUTPUT
 AC_MSG_NOTICE([
 ==============================================================================
 Build configuration:
-	debug:           ${enable_debug}
-	docs:            ${enable_doc}
-	werror:          ${enable_werror}
-	typeinfo-name:   ${use_typeinfo}
+	debug:              ${enable_debug}
+	docs:               ${enable_doc}
+	werror:             ${enable_werror}
 ==============================================================================
 ])

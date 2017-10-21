@@ -165,24 +165,15 @@
  */
 #define CPPUNIT_TEST_SUITE_END()                                               \
     }                                                                          \
-      									       \
-    struct CppUnitExDeleter { /* avoid deprecated auto_ptr warnings */         \
-	CPPUNIT_NS::TestSuite *suite;					       \
-	CppUnitExDeleter() : suite (0) {}				       \
-	~CppUnitExDeleter() { delete suite; }				       \
-	CPPUNIT_NS::TestSuite *release() {                                     \
-		CPPUNIT_NS::TestSuite *tmp = suite; suite = NULL; return tmp;  \
-        }                                                                      \
-    };                                                                         \
                                                                                \
 public:									       \
     static CPPUNIT_NS::TestSuite *suite()                                      \
     {                                                                          \
       const CPPUNIT_NS::TestNamer &namer = getTestNamer__();                   \
-      CppUnitExDeleter guard;                                                  \
-      guard.suite = new CPPUNIT_NS::TestSuite( namer.getFixtureName() );       \
+      std::unique_ptr<CPPUNIT_NS::TestSuite> guard(                            \
+              new CPPUNIT_NS::TestSuite( namer.getFixtureName() ));            \
       CPPUNIT_NS::ConcretTestFixtureFactory<TestFixtureType> factory;          \
-      CPPUNIT_NS::TestSuiteBuilderContextBase context( *guard.suite,           \
+      CPPUNIT_NS::TestSuiteBuilderContextBase context( *guard.get(),           \
                                                        namer,                  \
                                                        factory );              \
       TestFixtureType::addTestsToSuite( context );                             \
@@ -309,6 +300,17 @@ public:									       \
                   context.getTestNameFor( #testMethod),   \
                   &TestFixtureType::testMethod,           \
                   context.makeFixture() ) ) )
+
+#define CPPUNIT_TEST_PARAMETERIZED( testMethod, ... )    \
+    for (auto& i : __VA_ARGS__)                                  \
+    {                                                           \
+        TestFixtureType* fixture = context.makeFixture();       \
+        CPPUNIT_TEST_SUITE_ADD_TEST(                            \
+        ( new CPPUNIT_NS::TestCaller<TestFixtureType>(          \
+                    context.getTestNameFor(#testMethod, i),     \
+                    std::bind(&TestFixtureType::testMethod, fixture, i),          \
+                    fixture)));                                  \
+    }
 
 /*! \brief Add a test which fail if the specified exception is not caught.
  *

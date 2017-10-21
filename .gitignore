@@ -28,9 +28,12 @@ test-driver
 .libs
 *.lo
 *.log
+<<<<<<< HEAD
 *.trs
+=======
+>>>>>>> upstream/master
 *.tar.*
-cppunit-config
+*.trs
 _configs.sed
 
 examples/cppunittest/cppunittestmain
