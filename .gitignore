@@ -7,6 +7,7 @@ config.guess
 config.h
 config-auto.h
 config.h.in
+config.log
 config.sub
 config.status
 configure
@@ -28,10 +29,6 @@ test-driver
 .libs
 *.lo
 *.log
-<<<<<<< HEAD
-*.trs
-=======
->>>>>>> upstream/master
 *.tar.*
 *.trs
 _configs.sed
